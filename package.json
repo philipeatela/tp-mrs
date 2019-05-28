@@ -1,0 +1,9 @@
+{
+  "name": "tp-mrs",
+  "version": "1.0.0",
+  "description": "Trabalho pratico de MRS",
+  "main": "index.js",
+  "repository": "git@github.com:philipeatela/tp-mrs.git",
+  "author": "philipeatela <philipeatela@gmail.com>",
+  "license": "MIT"
+}

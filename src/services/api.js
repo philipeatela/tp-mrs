@@ -1,7 +1,7 @@
 import { create } from 'apisauce'
 
 const username = 'philipeatela'
-const pw = '3wkA8zuH2SSY2qH57jk6'
+const pw = ''
 const authdata = Buffer.from(username + ':' + pw).toString('base64')
 
 const api = create({

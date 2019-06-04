@@ -2,6 +2,11 @@
   "name": "mrs-tp-philipe",
   "version": "0.1.0",
   "private": true,
+  "description": "Trabalho pratico de MRS",
+  "main": "index.js",
+  "repository": "git@github.com:philipeatela/tp-mrs.git",
+  "author": "philipeatela <philipeatela@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "apisauce": "^1.0.2",
     "babel": "^6.5.2",

@@ -1,68 +1,19 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# TRABALHO PRÁTICO DE MRS - ANÁLISE DO PROCESSO DE INTEGRAÇÃO CONTÍNUA DOS REPOSITÓRIOS
 
-## Available Scripts
+## Aluno: Philipe Pinheiro Atela
 
-In the project directory, you can run:
+## Professor: André Hora
 
-### `npm start`
+Grande parte dos sistemas desenvolvidos e mantidos atualmente possuem uma pipeline de integração contínua configurada, de forma a executar um processo de build sempre que for adicionado código novo nas branches principais, ou em outras situações como abertura de uma pull request. O processo de build envolve vários passos como a instalação de dependências, deploy em servidores, testes automatizados e configuração de sistemas de log.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+O objetivo deste trabalho é analisar em alto nível o processo de integração contínua e a estabilidade de sistemas existentes, inicialmente com foco no contexto de uma pequena fábrica de software, mas com possibilidade de aplicação em quaisquer sistemas que utilizem a plataforma do Bitbucket Pipelines para realizar o processo.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+As métricas a serem calculadas seriam:
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+* Dado um projeto, qual a porcentagem dos commits dados em master/develop quebram o build da aplicação?
+* Quais as palavras chaves mais comuns nestes commits? (fix, feature…)
+* Durante qual porcentagem do tempo a aplicação permaneceu online desde o primeiro build bem sucedido?
+* Recorde de tempo que o sistema ficou estável
+* Qual o passo do processo de build mais propenso a dar erro? (Testes, dependências, deploy…)
+* Com qual frequência o código dos arquivos relacionados ao build são alterados? Quais arquivos são alterados junto com este?
+Qual o tempo médio de build do projeto? Como este variou ao longo do tempo?

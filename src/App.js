@@ -1,61 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Router, Link } from "@reach/router";
 
-import './App.css';
-import { callEndpoint, endpoints } from './services/api';
-import { parseRepositories } from './parsers';
-
-const AppHeader = styled.header`
-  font-size: calc(10px + 2vmin);
-  color: white;
-  margin: 2em;
-`;
-
-const AppBody = styled.main`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-`;
-
-const AppFooter = styled.footer`
-  margin: 2em;
-`;
-
-const RepoWrapper = styled.div`
-`;
+import "./App.css";
+import Home from './components/Home';
+import RepoPage from './components/RepoPage';
+import LayoutBasis from './components/LayoutBasis';
 
 function App() {
-  const [repoData, setRepoData] = useState(null);
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    const data = await callEndpoint(endpoints.getAllRepositories);
-    setRepoData(parseRepositories(data));
-  }
-
+  const [currentRepo, setCurrentRepo] = useState(null);
   return (
-    <body className="App">
-      <AppHeader>
-        Trabalho Prático MRS - Relatório de Builds
-      </AppHeader>
-      <AppBody>
-        <h2>Lista de Repositórios do time:</h2>
-        {!repoData && <p>Carregando dados...</p>}
-        {repoData && repoData.map(({ name, id, created_on }) => (
-          <RepoWrapper>
-            <p>{`Nome: ${name}`}</p>
-            <p>{`ID: ${id}`}</p>
-            <p>{`Data de criação: ${created_on}`}</p>
-          </RepoWrapper>
-        ))}
-      </AppBody>
-      <AppFooter>
-        Por Philipe Pinheiro Atela, 2019
-      </AppFooter>
-    </body>
+    <LayoutBasis>
+      <Router>  
+        <Home path="/" callback={setCurrentRepo}/>
+        <RepoPage path="repo" repoId={currentRepo} />
+      </Router> 
+    </LayoutBasis>
   );
 }
 

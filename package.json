@@ -8,6 +8,7 @@
   "author": "philipeatela <philipeatela@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@reach/router": "^1.2.1",
     "apisauce": "^1.0.2",
     "babel": "^6.5.2",
     "babel-cli": "^6.0.0",

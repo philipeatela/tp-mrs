@@ -7,6 +7,7 @@ import { callEndpoint, endpoints, TEAM_ID } from "../services/api";
 import { parseRepositories } from "../parsers";
 import { navigate } from "@reach/router";
 import Loader from "./Loader";
+import { reposData } from './data';
 
 const AppHeader = styled.header`
   font-size: calc(10px + 2vmin);
@@ -59,6 +60,22 @@ const Text = styled.span`
 `;
 
 function Home({ callback }) {
+  const MaxObjs = {
+    _failCount: Math.max.apply(Math, reposData.map(function(o) { return o._failCount; })),
+    _successCount: Math.max.apply(Math, reposData.map(function(o) { return o._successCount; })),
+    _prodCount: Math.max.apply(Math, reposData.map(function(o) { return o._prodCount; })),
+    _devCount: Math.max.apply(Math, reposData.map(function(o) { return o._devCount; })),
+    _otherCount: Math.max.apply(Math, reposData.map(function(o) { return o._otherCount; })),
+    mTime: Math.max.apply(Math, reposData.map(function(o) { return o.mTime; })),
+    _prodSuccessCount: Math.max.apply(Math, reposData.map(function(o) { return o._prodSuccessCount; })),
+    _devSuccessCount: Math.max.apply(Math, reposData.map(function(o) { return o._devSuccessCount; })),
+    _otherSuccessCount: Math.max.apply(Math, reposData.map(function(o) { return o._otherSuccessCount; })),
+    _maxConsecutiveFails: Math.max.apply(Math, reposData.map(function(o) { return o._maxConsecutiveFails; })),
+    mean: Math.max.apply(Math, reposData.map(function(o) { return o.mean; })),
+  }
+  
+  console.log(MaxObjs);
+
   const [repoData, setRepoData] = useState(null);
   useEffect(() => {
     fetchData();
@@ -114,6 +131,13 @@ function Home({ callback }) {
             ))}
           </List>
         )}
+
+        <h2>Recordes dos repositorios:</h2>
+        <p>Maior média de commits para re-estabelecer: {Math.round(MaxObjs.mean)}</p>
+        <p>Maior número de quebras em produção: {MaxObjs._prodCount}</p>
+        <p>Maior número de quebras em geral: {MaxObjs._failCount}</p>
+        <p>Maior média de tempo para executar a pipeline: {Math.round(MaxObjs.mTime)} segundos</p>
+        <p>Maior número de falhas consecutivas: {MaxObjs._maxConsecutiveFails}</p>
       </AppBody>
       <AppFooter>Por Philipe Pinheiro Atela, 2019</AppFooter>
     </main>

@@ -1,23 +1,33 @@
-import React from 'react';
-import styled from 'styled-components';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import React from "react";
+import styled from "styled-components";
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend
+} from "recharts";
+import fs from 'fs';
 
-import { callEndpoint, TEAM_ID } from '../services/api';
+import { callEndpoint, TEAM_ID } from "../services/api";
 import Loader from "./Loader";
 
 function getMostCommon(array) {
   var count = {};
-  array.forEach(function (a) {
-      count[a] = (count[a] || 0) + 1;
+  array.forEach(function(a) {
+    count[a] = (count[a] || 0) + 1;
   });
-  return Object.keys(count).reduce(function (r, k, i) {
-      if (!i || count[k] > count[r[0]]) {
-          return [k];
-      }
-      if (count[k] === count[r[0]]) {
-          r.push(k);
-      }
-      return r;
+  return Object.keys(count).reduce(function(r, k, i) {
+    if (!i || count[k] > count[r[0]]) {
+      return [k];
+    }
+    if (count[k] === count[r[0]]) {
+      r.push(k);
+    }
+    return r;
   }, []);
 }
 
@@ -69,7 +79,7 @@ export const RepoPage = ({ repoId }) => {
   React.useEffect(() => {
     fetchData();
   }, []);
-  
+
   const fetchData = async () => {
     const pipelinesUrl = `/repositories/${TEAM_ID}/${repoId}/pipelines/?pagelen=100`;
     const repoPipelines = await callEndpoint(pipelinesUrl);
@@ -91,24 +101,23 @@ export const RepoPage = ({ repoId }) => {
 
     repoPipelines.forEach(pipeline => {
       timeCounter = timeCounter + pipeline.duration_in_seconds;
-      if (!pipeline.state || !pipeline.state.result){
+      if (!pipeline.state || !pipeline.state.result) {
         return;
       }
-      if (pipeline.state.result.name === 'FAILED') {
+      if (pipeline.state.result.name === "FAILED") {
         // Count consecutive fails
         consecutiveFails = consecutiveFails + 1;
         _failCount = _failCount + 1;
 
-        if (pipeline.target.ref_name === 'master') {
+        if (pipeline.target.ref_name === "master") {
           _prodCount = _prodCount + 1;
-        } else if (pipeline.target.ref_name === 'develop') {
+        } else if (pipeline.target.ref_name === "develop") {
           _devCount = _devCount + 1;
         } else {
           _otherCount = _otherCount + 1;
         }
-
       }
-      if (pipeline.state.result.name === 'SUCCESSFUL') {
+      if (pipeline.state.result.name === "SUCCESSFUL") {
         // Count consecutive fails
         if (consecutiveFails > 0) {
           consecutiveFailsArray.push(consecutiveFails);
@@ -120,85 +129,131 @@ export const RepoPage = ({ repoId }) => {
 
         _successCount = _successCount + 1;
 
-        if (pipeline.target.ref_name === 'master') {
+        if (pipeline.target.ref_name === "master") {
           _prodSuccessCount = _prodSuccessCount + 1;
-        } else if (pipeline.target.ref_name === 'develop') {
+        } else if (pipeline.target.ref_name === "develop") {
           _devSuccessCount = _devSuccessCount + 1;
         } else {
           _otherSuccessCount = _otherSuccessCount + 1;
         }
       }
-    })
+    });
 
     const authors = repoPipelines.map(pipeline => {
-      return pipeline.creator ? pipeline.creator.username : '';
+      return pipeline.creator ? pipeline.creator.username : "";
     });
-    const filteredAuthors = authors.filter((author) => author === '' ? false : true);
+    const filteredAuthors = authors.filter(author =>
+      author === "" ? false : true
+    );
     const _mostBreaks = getMostCommon(filteredAuthors);
-    console.log('_maxConsecutiveFails', _maxConsecutiveFails);
-    console.log('consecutiveFails', consecutiveFails);
+    console.log("_maxConsecutiveFails", _maxConsecutiveFails);
+    console.log("consecutiveFails", consecutiveFails);
 
-    const sum = consecutiveFailsArray ? consecutiveFailsArray.reduce((acc, value) => {
-      return acc += value;
-    }, 0) : 1;
+    const sum = consecutiveFailsArray
+      ? consecutiveFailsArray.reduce((acc, value) => {
+          return (acc += value);
+        }, 0)
+      : 1;
 
-    const mean = sum / consecutiveFailsArray.length;
-    console.log('mean', mean);
+    let mean;
+    if (sum > 0 && consecutiveFailsArray.length > 0) {
+      mean = sum / consecutiveFailsArray.length;
+    }
 
     setFailCount(_failCount);
     setSuccessCount(_successCount);
     setProdCount(_prodCount);
     setDevCount(_devCount);
     setOtherCount(_otherCount);
-    setMeanTime(timeCounter / repoPipelines.length);
+    const mTime = timeCounter / repoPipelines.length
+    setMeanTime(mTime);
     setMostBreaks(_mostBreaks);
     setDevSuccessCount(_prodSuccessCount);
     setProdSuccessCount(_devSuccessCount);
     setOtherSuccessCount(_otherSuccessCount);
     setMaxConsecutiveFails(_maxConsecutiveFails);
     setMeanConsecutiveFails(mean);
-  }
+
+    const repoInformation = {
+      _failCount,
+      _successCount,
+      _prodCount,
+      _devCount,
+      _otherCount,
+        mTime,
+      _mostBreaks,
+      _prodSuccessCount,
+      _devSuccessCount,
+      _otherSuccessCount,
+      _maxConsecutiveFails,
+      mean,
+    };
+    console.log(repoInformation);
+  };
 
   const successAndFailData = [
     {
-      name: 'Consolidado',
+      name: "Consolidado",
       sucesso: successCount,
-      falha: failCount,
+      falha: failCount
     },
     {
-      name: 'Desenvolvimento',
+      name: "Desenvolvimento",
       sucesso: devSuccessCount,
-      falha: devCount,
+      falha: devCount
     },
     {
-      name: 'Produção',
+      name: "Produção",
       sucesso: prodSuccessCount,
-      falha: prodCount,
+      falha: prodCount
     },
     {
-      name: 'Outras',
+      name: "Outras",
       sucesso: otherSuccessCount,
-      falha: otherCount,
-    },
-  ]
+      falha: otherCount
+    }
+  ];
 
   return (
     <Wrapper>
       {!failCount && <Loader />}
       {failCount && <MyHeader>Dados de build deste repositório</MyHeader>}
-      {meanTime && <SubHeader>Média de tempo de build: <ResultText>{Math.round(meanTime)} segundos</ResultText></SubHeader>}
-      {mostBreaks && <SubHeader>Campeao de quebras: <ResultText>{`Usuario 1`}</ResultText></SubHeader>}
-      {maxConsecutiveFails && <SubHeader>Máximo consecutivo de falhas: <ResultText>{maxConsecutiveFails}</ResultText></SubHeader>}
-      {meanConsecutiveFails && <SubHeader>Média de falhas consecutivas: <ResultText>{meanConsecutiveFails}</ResultText></SubHeader>}
-      {failCount && <SubHeader>Pipelines bem sucedidas x mal sucedidas</SubHeader>}
-      {failCount &&
-      (
+      {meanTime && (
+        <SubHeader>
+          Média de tempo de build:{" "}
+          <ResultText>{Math.round(meanTime)} segundos</ResultText>
+        </SubHeader>
+      )}
+      {mostBreaks && (
+        <SubHeader>
+          Campeao de quebras: <ResultText>{`Usuario 1`}</ResultText>
+        </SubHeader>
+      )}
+      {maxConsecutiveFails && (
+        <SubHeader>
+          Máximo consecutivo de falhas:{" "}
+          <ResultText>{maxConsecutiveFails}</ResultText>
+        </SubHeader>
+      )}
+      {meanConsecutiveFails && (
+        <SubHeader>
+          Média de falhas consecutivas:{" "}
+          <ResultText>{Math.round(meanConsecutiveFails)}</ResultText>
+        </SubHeader>
+      )}
+      {failCount && (
+        <SubHeader>Pipelines bem sucedidas x mal sucedidas</SubHeader>
+      )}
+      {failCount && (
         <BarChart
           width={800}
           height={400}
           data={successAndFailData}
           margin={{
-            top: 5, right: 30, left: 20, bottom: 5,
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />

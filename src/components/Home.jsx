@@ -4,6 +4,7 @@ import { Link } from "@reach/router";
 
 import { callEndpoint, endpoints, TEAM_ID } from "../services/api";
 import { parseRepositories } from "../parsers";
+import { navigate } from "@reach/router";
 
 const AppHeader = styled.header`
   font-size: calc(10px + 2vmin);
@@ -36,7 +37,6 @@ function Home({ callback }) {
     const allReposData = await callEndpoint(allReposUrl);
     // Parse repos data
     const parsedReposData = parseRepositories(allReposData);
-    // setRepoData(parsedReposData);
 
     // Call envs endpoint for each repo to find out which ones have CI
     const _pipelineRepos = await Promise.all(
@@ -58,7 +58,6 @@ function Home({ callback }) {
     const pipelineRepos = _pipelineRepos.filter(id =>
       id === 0 ? false : true
     );
-    console.log(pipelineRepos);
     setRepoData(pipelineRepos);
   };
 
@@ -71,13 +70,13 @@ function Home({ callback }) {
           {!repoData && <p>Carregando dados...</p>}
           {repoData &&
             repoData.map(({ name, id, created_on }) => (
-              <Link key={id} onClick={callback(id)} to="repo">
+              <li key={id} onClick={() => navigate(`/repo/${id}`)} to="repo">
                 <RepoWrapper>
                   <p>{`Nome: ${name}`}</p>
                   <p>{`ID: ${id}`}</p>
                   <p>{`Data de criação: ${created_on}`}</p>
                 </RepoWrapper>
-              </Link>
+              </li>
             ))}
         </ul>
       </AppBody>

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { endpoints, callEndpoint, TEAM_ID } from '../services/api';
+import { callEndpoint, TEAM_ID } from '../services/api';
 
 const Wrapper = styled.div`
 
@@ -9,7 +9,6 @@ const Wrapper = styled.div`
 
 export const RepoPage = ({ repoId }) => {
   const [repoData, setRepoData] = React.useState(null);
-  console.log(repoId);
   React.useEffect(() => {
     fetchData();
   }, []);

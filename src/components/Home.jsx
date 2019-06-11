@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "@reach/router";
+import moment from "moment";
 
 import { callEndpoint, endpoints, TEAM_ID } from "../services/api";
 import { parseRepositories } from "../parsers";
 import { navigate } from "@reach/router";
+import Loader from "./Loader";
 
 const AppHeader = styled.header`
   font-size: calc(10px + 2vmin);
@@ -23,7 +25,33 @@ const AppFooter = styled.footer`
   margin: 2em;
 `;
 
-const RepoWrapper = styled.li``;
+const List = styled.ul`
+  border: 3px solid black;
+  border-radius: 1%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+`;
+
+const ListItem = styled.li`
+  border-bottom: 1px solid black;
+  list-style-type: none;
+  width: 100%;
+  height: 150px;
+  background-color: #949396;
+  padding: 0.5em;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Text = styled.span`
+  margin: 0.5em;
+`;
 
 function Home({ callback }) {
   const [repoData, setRepoData] = useState(null);
@@ -66,19 +94,21 @@ function Home({ callback }) {
       <AppHeader>Trabalho Prático MRS - Relatório de Builds</AppHeader>
       <AppBody>
         <h2>Lista de Repositórios do time:</h2>
-        <ul>
-          {!repoData && <p>Carregando dados...</p>}
-          {repoData &&
-            repoData.map(({ name, id, created_on }) => (
-              <li key={id} onClick={() => navigate(`/repo/${id}`)} to="repo">
-                <RepoWrapper>
-                  <p>{`Nome: ${name}`}</p>
-                  <p>{`ID: ${id}`}</p>
-                  <p>{`Data de criação: ${created_on}`}</p>
-                </RepoWrapper>
-              </li>
+        {!repoData && <Loader />}
+        {repoData && (
+          <List>
+            {repoData.map(({ name, id, formattedDate }) => (
+              <ListItem
+                key={id}
+                onClick={() => navigate(`/repo/${id}`)}
+                to="repo"
+              >
+                <Text>{`Nome: ${name}`}</Text>
+                <Text>{`Data de criação: ${formattedDate}`}</Text>
+              </ListItem>
             ))}
-        </ul>
+          </List>
+        )}
       </AppBody>
       <AppFooter>Por Philipe Pinheiro Atela, 2019</AppFooter>
     </main>

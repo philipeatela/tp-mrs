@@ -1,14 +1,20 @@
+import moment from 'moment';
+
 export const parseRepositories = data => {
   // const values = data.values;
   if (!data)
     return;
   const parsedData = data.map(
-    ({ full_name, created_on, mainbranch, uuid }) => ({
-      name: full_name,
-      created_on,
-      mainbranch,
-      id: uuid
-    })
+    ({ full_name, created_on, mainbranch, uuid }, index) => {
+      const formattedDate = moment(created_on).format('DD-MM-YYYY');
+      const name = `Projeto ${index + 1}`;
+      return ({
+        name,
+        formattedDate,
+        mainbranch,
+        id: uuid
+      })
+    }
   );
 
   return parsedData;

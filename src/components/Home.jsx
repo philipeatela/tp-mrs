@@ -47,6 +47,11 @@ const ListItem = styled.li`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  opacity: 0.5;
+  :hover {
+    opacity: 1;
+  }
 `;
 
 const Text = styled.span`

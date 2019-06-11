@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 import { callEndpoint, TEAM_ID } from '../services/api';
+import Loader from "./Loader";
 
 function getMostCommon(array) {
   var count = {};
@@ -20,7 +22,28 @@ function getMostCommon(array) {
 }
 
 const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 
+const MyHeader = styled.header`
+  margin: 0.5em;
+  font-size: 40px;
+  font-weight: bold;
+  text-decoration: underline;
+`;
+
+const SubHeader = styled.h3`
+  margin: 0.2em;
+`;
+
+const ResultText = styled.span`
+  /* text-decoration: underline; */
+  font-weight: bold;
+  color: green;
+  margin: 0.4em;
 `;
 
 export const RepoPage = ({ repoId }) => {
@@ -28,12 +51,20 @@ export const RepoPage = ({ repoId }) => {
   const [successCount, setSuccessCount] = React.useState(null);
 
   const [prodCount, setProdCount] = React.useState(null);
+  const [prodSuccessCount, setProdSuccessCount] = React.useState(null);
   const [devCount, setDevCount] = React.useState(null);
+  const [devSuccessCount, setDevSuccessCount] = React.useState(null);
+
   const [otherCount, setOtherCount] = React.useState(null);
+  const [otherSuccessCount, setOtherSuccessCount] = React.useState(null);
 
   const [meanTime, setMeanTime] = React.useState(null);
 
   const [mostBreaks, setMostBreaks] = React.useState(null);
+
+  const [maxConsecutiveFails, setMaxConsecutiveFails] = React.useState(null);
+
+  const [meanConsecutiveFails, setMeanConsecutiveFails] = React.useState(null);
 
   React.useEffect(() => {
     fetchData();
@@ -46,8 +77,17 @@ export const RepoPage = ({ repoId }) => {
     let _successCount = 0;
     let _prodCount = 0;
     let _devCount = 0;
+    let _devSuccessCount = 0;
+    let _prodSuccessCount = 0;
+
     let _otherCount = 0;
+    let _otherSuccessCount = 0;
     let timeCounter = 0;
+
+    let _maxConsecutiveFails = 0;
+    let consecutiveFails = 0;
+
+    const consecutiveFailsArray = [];
 
     repoPipelines.forEach(pipeline => {
       timeCounter = timeCounter + pipeline.duration_in_seconds;
@@ -55,6 +95,8 @@ export const RepoPage = ({ repoId }) => {
         return;
       }
       if (pipeline.state.result.name === 'FAILED') {
+        // Count consecutive fails
+        consecutiveFails = consecutiveFails + 1;
         _failCount = _failCount + 1;
 
         if (pipeline.target.ref_name === 'master') {
@@ -67,7 +109,24 @@ export const RepoPage = ({ repoId }) => {
 
       }
       if (pipeline.state.result.name === 'SUCCESSFUL') {
+        // Count consecutive fails
+        if (consecutiveFails > 0) {
+          consecutiveFailsArray.push(consecutiveFails);
+        }
+        if (consecutiveFails > _maxConsecutiveFails) {
+          _maxConsecutiveFails = consecutiveFails;
+          consecutiveFails = 0;
+        }
+
         _successCount = _successCount + 1;
+
+        if (pipeline.target.ref_name === 'master') {
+          _prodSuccessCount = _prodSuccessCount + 1;
+        } else if (pipeline.target.ref_name === 'develop') {
+          _devSuccessCount = _devSuccessCount + 1;
+        } else {
+          _otherSuccessCount = _otherSuccessCount + 1;
+        }
       }
     })
 
@@ -76,6 +135,15 @@ export const RepoPage = ({ repoId }) => {
     });
     const filteredAuthors = authors.filter((author) => author === '' ? false : true);
     const _mostBreaks = getMostCommon(filteredAuthors);
+    console.log('_maxConsecutiveFails', _maxConsecutiveFails);
+    console.log('consecutiveFails', consecutiveFails);
+
+    const sum = consecutiveFailsArray ? consecutiveFailsArray.reduce((acc, value) => {
+      return acc += value;
+    }, 0) : 1;
+
+    const mean = sum / consecutiveFailsArray.length;
+    console.log('mean', mean);
 
     setFailCount(_failCount);
     setSuccessCount(_successCount);
@@ -84,22 +152,64 @@ export const RepoPage = ({ repoId }) => {
     setOtherCount(_otherCount);
     setMeanTime(timeCounter / repoPipelines.length);
     setMostBreaks(_mostBreaks);
-
+    setDevSuccessCount(_prodSuccessCount);
+    setProdSuccessCount(_devSuccessCount);
+    setOtherSuccessCount(_otherSuccessCount);
+    setMaxConsecutiveFails(_maxConsecutiveFails);
+    setMeanConsecutiveFails(mean);
   }
+
+  const successAndFailData = [
+    {
+      name: 'Consolidado',
+      sucesso: successCount,
+      falha: failCount,
+    },
+    {
+      name: 'Desenvolvimento',
+      sucesso: devSuccessCount,
+      falha: devCount,
+    },
+    {
+      name: 'Produção',
+      sucesso: prodSuccessCount,
+      falha: prodCount,
+    },
+    {
+      name: 'Outras',
+      sucesso: otherSuccessCount,
+      falha: otherCount,
+    },
+  ]
 
   return (
     <Wrapper>
-      {!failCount && <p>Carregando dados...</p>}
-      {failCount && <h1>Quebras de build: {failCount}</h1>}
-      {successCount && <h1>Pipelines bem sucedidas: {successCount}</h1>}
-
-      {prodCount && <h1>Quebras em produção: {prodCount}</h1>}
-      {devCount && <h1>Quebras em desenvolvimento: {devCount}</h1>}
-      {otherCount && <h1>Quebras em feature: {otherCount}</h1>}
-
-      {meanTime && <h1>Média de tempo de build: {Math.round(meanTime)} segundos</h1>}
-
-      {mostBreaks && <h1>Campeao de quebras: {mostBreaks}</h1>}
+      {!failCount && <Loader />}
+      {failCount && <MyHeader>Dados de build deste repositório</MyHeader>}
+      {meanTime && <SubHeader>Média de tempo de build: <ResultText>{Math.round(meanTime)} segundos</ResultText></SubHeader>}
+      {mostBreaks && <SubHeader>Campeao de quebras: <ResultText>{`Usuario 1`}</ResultText></SubHeader>}
+      {maxConsecutiveFails && <SubHeader>Máximo consecutivo de falhas: <ResultText>{maxConsecutiveFails}</ResultText></SubHeader>}
+      {meanConsecutiveFails && <SubHeader>Média de falhas consecutivas: <ResultText>{meanConsecutiveFails}</ResultText></SubHeader>}
+      {failCount && <SubHeader>Pipelines bem sucedidas x mal sucedidas</SubHeader>}
+      {failCount &&
+      (
+        <BarChart
+          width={800}
+          height={400}
+          data={successAndFailData}
+          margin={{
+            top: 5, right: 30, left: 20, bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="sucesso" fill="#82ca9d" />
+          <Bar dataKey="falha" fill="#DC143C" />
+        </BarChart>
+      )}
     </Wrapper>
   );
 };

@@ -23,6 +23,7 @@ const AppBody = styled.main`
 `;
 
 const AppFooter = styled.footer`
+  border-top: 1px solid black;
   margin: 2em;
 `;
 

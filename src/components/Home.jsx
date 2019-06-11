@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Link } from "@reach/router";
-import moment from "moment";
+import { navigate } from "@reach/router";
 
 import { callEndpoint, endpoints, TEAM_ID } from "../services/api";
 import { parseRepositories } from "../parsers";
-import { navigate } from "@reach/router";
 import Loader from "./Loader";
 import { reposData } from './data';
 
 const AppHeader = styled.header`
   font-size: calc(10px + 2vmin);
   color: white;
-  margin: 2em;
+  margin: 0.5em;
+  font-size: 40px;
+  text-decoration: underline;
 `;
 
 const AppBody = styled.main`
@@ -34,6 +34,9 @@ const List = styled.ul`
   margin: 0;
   padding: 0;
   flex: 1;
+  columns: 3;
+  -webkit-columns: 3;
+  -moz-columns: 3;
 `;
 
 const ListItem = styled.li`
@@ -58,6 +61,16 @@ const ListItem = styled.li`
 
 const Text = styled.span`
   margin: 0.5em;
+`;
+
+const Button = styled.div`
+  background-color: #949396;
+  width: 225px;
+  margin: 1em;
+  padding: 1em;
+  border-radius: 2%;
+  text-align: center;
+  cursor: pointer;
 `;
 
 function Home({ callback }) {
@@ -116,6 +129,11 @@ function Home({ callback }) {
     <main className="Home">
       <AppHeader>Trabalho Prático MRS - Relatório de Builds</AppHeader>
       <AppBody>
+        <Button
+          onClick={() => navigate('/team')}
+        >
+          Visualizar Relatório Consolidado
+        </Button>
         <h2>Lista de Repositórios do time:</h2>
         {!repoData && <Loader />}
         {repoData && (

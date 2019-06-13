@@ -7,7 +7,7 @@ export const parseRepositories = data => {
   const parsedData = data.map(
     ({ full_name, created_on, mainbranch, uuid }, index) => {
       const formattedDate = moment(created_on).format('DD-MM-YYYY');
-      const name = `Projeto ${index + 1}`;
+      const name = `P${index + 1}`;
       return ({
         name,
         formattedDate,

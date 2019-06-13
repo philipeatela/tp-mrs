@@ -88,8 +88,6 @@ function Home({ callback }) {
     mean: Math.max.apply(Math, reposData.map(function(o) { return o.mean; })),
   }
   
-  console.log(MaxObjs);
-
   const [repoData, setRepoData] = useState(null);
   useEffect(() => {
     fetchData();

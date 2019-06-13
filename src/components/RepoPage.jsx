@@ -139,8 +139,8 @@ export const RepoPage = ({ repoId }) => {
       }
     });
 
-    const authors = repoPipelines.map(pipeline => {
-      return pipeline.creator ? pipeline.creator.username : "";
+    const authors = repoPipelines.map((pipeline, index) => {
+      return pipeline.creator ? `Desenvolvedor ${index}` : "";
     });
     const filteredAuthors = authors.filter(author =>
       author === "" ? false : true

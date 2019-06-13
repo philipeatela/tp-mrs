@@ -24,6 +24,10 @@ const Wrapper = styled.div`
 
 export const TeamPage = props => {
   const [commitSuccessRate, setCommitSuccessRate] = React.useState(null);
+  const [devCommitSuccessRate, setDevCommitSuccessRate] = React.useState(null);
+  const [prodCommitSuccessRate, setProdCommitSuccessRate] = React.useState(
+    null
+  );
   React.useEffect(() => {
     fetchData();
   }, []);
@@ -130,8 +134,8 @@ export const TeamPage = props => {
         }
 
         return {
-           name: repo.name,
-           data: repo.formattedDate,
+          name: repo.name,
+          data: repo.formattedDate,
           _failCount,
           _successCount,
           _prodCount,
@@ -148,7 +152,7 @@ export const TeamPage = props => {
     );
 
     console.log(reposDataArray);
-    // reposDataArray.sort((a,b) => (a.data > b.data) ? 1 : ((b.data > a.data) ? -1 : 0)); 
+    // reposDataArray.sort((a,b) => (a.data > b.data) ? 1 : ((b.data > a.data) ? -1 : 0));
 
     const commitSuccessRates = reposDataArray.map(repoData => {
       const { _failCount, _successCount } = repoData;
@@ -156,43 +160,115 @@ export const TeamPage = props => {
         return 0;
       }
       const failRate = _failCount / (_failCount + _successCount);
-      
-
       return {
         Projeto: repoData.name,
         Falhas: failRate,
-        data: repoData.data,
+        data: repoData.data
       };
     });
 
+    const devCommitSuccessRates = reposDataArray.map(repoData => {
+      const { _devCount, _devSuccessCount } = repoData;
+      if (!_devSuccessCount) {
+        return 0;
+      }
+      const failRate = _devCount / (_devCount + _devSuccessCount);
+      return {
+        Projeto: repoData.name,
+        Falhas: failRate,
+        data: repoData.data
+      };
+    });
+
+    const prodCommitSuccessRates = reposDataArray.map(repoData => {
+      const { _prodCount, _prodSuccessCount } = repoData;
+      if (!_prodSuccessCount) {
+        return 0;
+      }
+      const failRate = _prodCount / (_prodCount + _prodSuccessCount);
+      return {
+        Projeto: repoData.name,
+        Falhas: failRate,
+        data: repoData.data
+      };
+    });
+    setDevCommitSuccessRate(devCommitSuccessRates);
     setCommitSuccessRate(commitSuccessRates);
+    setProdCommitSuccessRate(prodCommitSuccessRates);
   };
 
   return (
     <Wrapper>
       <h1>Dados consolidados do time</h1>
-      <h2>Taxa de sucesso dos commits por projeto</h2>
       {!commitSuccessRate && <Loader />}
       {commitSuccessRate && (
-        <BarChart
-          width={1200}
-          height={400}
-          data={commitSuccessRate}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="Projeto" />
-          <YAxis />
-          <Tooltip />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="Falhas" fill="#DC143C" />
-        </BarChart>
+        <>
+          <h2>Taxa de sucesso dos commits por projeto</h2>
+          <BarChart
+            width={1200}
+            height={400}
+            data={commitSuccessRate}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="Projeto" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Falhas" fill="#DC143C" />
+          </BarChart>
+        </>
+      )}
+      {devCommitSuccessRate && (
+        <>
+          <h2>Taxa de sucesso dos commits por projeto (Desenvolvimento)</h2>
+          <BarChart
+            width={1200}
+            height={400}
+            data={devCommitSuccessRate}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="Projeto" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Falhas" fill="#DC143C" />
+          </BarChart>
+        </>
+      )}
+      {prodCommitSuccessRate && (
+        <>
+          <h2>Taxa de sucesso dos commits por projeto (Produção)</h2>
+          <BarChart
+            width={1200}
+            height={400}
+            data={prodCommitSuccessRate}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="Projeto" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Falhas" fill="#DC143C" />
+          </BarChart>
+        </>
       )}
     </Wrapper>
   );

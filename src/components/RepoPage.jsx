@@ -97,9 +97,12 @@ export const RepoPage = ({ repoId }) => {
     let _maxConsecutiveFails = 0;
     let consecutiveFails = 0;
 
+    let repo_name;
+
     const consecutiveFailsArray = [];
 
     repoPipelines.forEach(pipeline => {
+      repo_name = pipeline.repository.name || '';
       timeCounter = timeCounter + pipeline.duration_in_seconds;
       if (!pipeline.state || !pipeline.state.result) {
         return;
@@ -168,8 +171,8 @@ export const RepoPage = ({ repoId }) => {
     const mTime = timeCounter / repoPipelines.length
     setMeanTime(mTime);
     setMostBreaks(_mostBreaks);
-    setDevSuccessCount(_prodSuccessCount);
-    setProdSuccessCount(_devSuccessCount);
+    setDevSuccessCount(_devSuccessCount);
+    setProdSuccessCount(_prodSuccessCount);
     setOtherSuccessCount(_otherSuccessCount);
     setMaxConsecutiveFails(_maxConsecutiveFails);
     setMeanConsecutiveFails(mean);
@@ -188,6 +191,7 @@ export const RepoPage = ({ repoId }) => {
       _maxConsecutiveFails,
       mean,
     };
+    console.log('Repo name', repo_name)
     console.log(repoInformation);
   };
 

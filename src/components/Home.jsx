@@ -120,6 +120,7 @@ function Home({ callback }) {
     const pipelineRepos = _pipelineRepos.filter(id =>
       id === 0 ? false : true
     );
+    console.log(pipelineRepos);
     setRepoData(pipelineRepos);
   };
 

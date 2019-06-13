@@ -8,7 +8,9 @@ export const parseRepositories = data => {
     ({ full_name, created_on, mainbranch, uuid }, index) => {
       const formattedDate = moment(created_on).format('DD-MM-YYYY');
       const name = `P${index + 1}`;
+      // const name = full_name;
       return ({
+        full_name,
         name,
         formattedDate,
         mainbranch,
@@ -17,7 +19,17 @@ export const parseRepositories = data => {
     }
   );
 
-  return parsedData;
+  const filterRepos = parsedData.filter(repo => {
+    // if (repo.full_name === "natahouse/frontend-ci-test") {
+    //   return false;
+    // }
+    // if (repo.full_name === "natahouse/foco-app-create-log") {
+    //   return false;
+    // }
+    return true;
+  })
+
+  return filterRepos;
 };
 
 export const parsePipelines = data => {
